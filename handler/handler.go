@@ -21,7 +21,7 @@ type errorData struct {
 func render(w http.ResponseWriter, status int, templateName string, data any) {
 
 	// didn't use parsglob 3shan law fe error mayzhrlesh w ana bexecute yzhar w ana bparse
-	tmpl, err := template.ParseFiles("templates/artist.html", "templates/index.html", "templates/layout.html")
+	tmpl, err := template.ParseFiles("templates/artist.html", "templates/index.html")
 	if err != nil {
 		renderError(w, errorData{Msg: "500: Internal Server Error. Failed to load Templates", Status: http.StatusInternalServerError})
 		return

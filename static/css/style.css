@@ -1,0 +1,19 @@
+.grid{
+    display: grid;
+    grid-template-columns: 300px 300px 300px 300px;
+    
+    gap: 2em;
+    
+    
+    justify-content: center;
+    align-content: center;
+}
+.item {
+    
+    
+    background-color: white;
+    color : black;
+    border: 1.5 solid #111;
+    border-radius: 4px;
+    overflow: hidden;
+}

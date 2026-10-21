@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Groupie-Tracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <header><h1>Header PlaceHolder</h1></header>
     <main>
-        <div class ="artist">
+        <nav class="topbar"><a href="/" class="brand">Groupie Tracker</a></nav>
+        <div class ="grid">
             {{range .}}
-            <div class ="card">
-                <img src = "{{.Image}}" alt ="" width="300" height="300">
+            <div class ="item">
+                <img src = "{{.Image}}" alt ="" width="100" height="100">
                 <p>
                     <a href ="/artist?id={{.ID}}">{{.Name}}</a>
                     <br> 
