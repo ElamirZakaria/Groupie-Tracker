@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groupie-Tracker</title>
+</head>
+<body>
+   <main>
+    <a class ="back" href="/">Back to all artists</a>
+    <article>
+        <img src="{{.Image}}" alt ="{{.Name}}" width="360" height="360">
+        <div>
+            <h1>{{.Name}}</h1>
+            <dl class ="details ">
+                <dt>Active since</dt><dd>{{.CreationDate}}</dd>
+                <dt>First album</dt><dd>{{.FirstAlbum}}</dd>
+                <dt>Members</dt>
+                <dd>
+                    <ul class="members">{{range .Members}}<li>{{.}}</li>{{end}}</ul>
+                </dd>
+            </dl>
+        </div>
+    </article>
+    <section class="concerts">
+    <h2>Concerts</h2>
+    {{if not .Relations}}
+        <p class="notice">No concerts are listed for this artist.</p>
+    {{else}}
+        <ul class="tour">
+            {{range $location, $dates := .Relations}}
+                <li class="tour-stop">
+                    <!-- Location Name (Map Key) -->
+                    <strong class="location-name">{{$location}}</strong>
+                    
+                    <!-- Dates List (Map Value: []string) -->
+                    <ul class="dates-list">
+                        {{range $dates}}
+                            <li class="date-item">{{.}}</li>
+                        {{end}}
+                    </ul>
+                </li>
+            {{end}}
+        </ul>
+    {{end}}
+</section>
+   </main>
+</body>
+</html>
+
+         
