@@ -17,7 +17,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/static/", handler.StaticHandler)
 	mux.HandleFunc("/", app.HomeHandler)
-	mux.HandleFunc("/artist", app.ArtistHandler)
+	mux.HandleFunc("/artist/", app.ArtistHandler)
 	log.Println("Server is running on http://localhost:8080")
 	err = http.ListenAndServe(":8080", mux)
 	if err != nil {

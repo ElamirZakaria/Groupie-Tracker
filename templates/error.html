@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Groupie-Tracker</title>
-
+    <title>{{.Status}} - Error | Groupie Tracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
+<body class ="error-body">
+    <nav class="topbar">
+        <a href="/" class="brand">Groupie Tracker</a>
+    </nav>
+    <main class="error-main">
+        <div class ="error-card">
+            <span class ="error-badge">Status Code</span>
+            <h1 class="error-code">{{.Status}}</h1>
+            <p class="error-message">{{.Msg}}</p>
+            <a class ="back" href="/">&larr; Back to all artists</a>
+        </div>
+    </main>
     
 </body>
 </html>

@@ -70,14 +70,14 @@ func FetchAllData() ([]models.Artist, error) {
 	for _, v := range dates.Index {
 		dateMap[v.ID] = v.Dates
 	}
-	realtionsMap := make(map[int]map[string][]string)
+	relationsMap := make(map[int]map[string][]string)
 	for _, v := range relations.Index {
-		realtionsMap[v.ID] = v.DatesLocations
+		relationsMap[v.ID] = v.DatesLocations
 	}
 	for i := range artists {
 		artists[i].Locations = locationMap[artists[i].ID]
 		artists[i].ConcertDates = dateMap[artists[i].ID]
-		artists[i].Relations = realtionsMap[artists[i].ID]
+		artists[i].Relations = relationsMap[artists[i].ID]
 
 	}
 	return artists, nil

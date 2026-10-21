@@ -18,14 +18,18 @@ type errorData struct {
 	Status int
 }
 
+var tmpl *template.Template
+
 func render(w http.ResponseWriter, status int, templateName string, data any) {
 
-	// didn't use parsglob 3shan law fe error mayzhrlesh w ana bexecute yzhar w ana bparse
-	tmpl, err := template.ParseFiles("templates/artist.html", "templates/index.html")
-	if err != nil {
-		renderError(w, errorData{Msg: "500: Internal Server Error. Failed to load Templates", Status: http.StatusInternalServerError})
-		return
+	var err error
+	if tmpl == nil {
+		tmpl, err = template.ParseFiles("templates/artist.html", "templates/index.html", "templates/error.html")
+		if err != nil {
+			renderError(w, errorData{Msg: "500: Internal Server Error. Failed to load Templates", Status: http.StatusInternalServerError})
+			return
 
+		}
 	}
 	var buff bytes.Buffer
 	err = tmpl.ExecuteTemplate(&buff, templateName, data)
@@ -37,13 +41,18 @@ func render(w http.ResponseWriter, status int, templateName string, data any) {
 	buff.WriteTo(w)
 }
 func renderError(w http.ResponseWriter, data errorData) {
-	tmpl, err := template.ParseFiles("templates/error.html")
-	if err != nil {
-		http.Error(w, data.Msg, data.Status)
-		return
+
+	var err error
+	if tmpl == nil {
+		tmpl, err = template.ParseFiles("templates/artist.html", "templates/index.html", "templates/error.html")
+
+		if err != nil {
+			http.Error(w, data.Msg, data.Status)
+			return
+		}
 	}
 	var buff bytes.Buffer
-	err = tmpl.Execute(&buff, data)
+	err = tmpl.ExecuteTemplate(&buff, "error.html", data)
 	if err != nil {
 		http.Error(w, data.Msg, data.Status)
 		return
@@ -69,14 +78,18 @@ func (app *App) ArtistHandler(w http.ResponseWriter, r *http.Request) {
 		renderError(w, errorData{Msg: "405 Method Not Allowed", Status: http.StatusMethodNotAllowed})
 		return
 	}
-	idStr := r.URL.Query().Get("id")
+	idStr := strings.TrimPrefix(r.URL.Path, "/artist/")
+	if idStr == "" || strings.Contains(idStr, "/") {
+		renderError(w, errorData{Msg: "Error 404 Page Not Found", Status: http.StatusNotFound})
+		return
+	}
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		renderError(w, errorData{Msg: "Error 400 Bad Request", Status: http.StatusBadRequest})
 		return
 	}
 	if id <= 0 || id > len(app.Artists) {
-		renderError(w, errorData{Msg: "Error 404 Page Not Found", Status: http.StatusNotFound})
+		renderError(w, errorData{Msg: "Error 404 Artist Not Found", Status: http.StatusNotFound})
 		return
 	}
 	render(w, http.StatusOK, "artist.html", app.Artists[id-1])
