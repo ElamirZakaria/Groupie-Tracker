@@ -1,19 +1,24 @@
 :root{
     --ink: #181a24;
     --yellow: #ffd600;
-      --display: "Rockwell Extra Bold", Rockwell, "Arial Black", "Helvetica Neue", sans-serif;
-      --paper: #eceef6;
+    --display: "Rockwell Extra Bold", Rockwell, "Arial Black", "Helvetica Neue", sans-serif;
+    --paper: #eceef6;
+}
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 body {
+
      margin:0;
      background-color: var(--paper);
      color :var(--ink);
     
 }
 
+
 .topbar{
     background-color:  var(--ink);
-    padding: .75rem clamp(1rem, 4vw, 3rem);
+    padding : 0.75rem 2rem
    
     
 }
@@ -25,16 +30,20 @@ body {
 header {
     background-color: blue;
     color:#fff;
-    padding :clamp(2rem,6vw,4.5rem) ;
-    font: 800 clamp(2.2rem, 7vw, 5rem)/1 var(--display);
-     letter-spacing: -.02em; margin: 0 0 2rem; 
-   
-
+    padding :3rem 2rem;
+    
+}
+header h1 {
+   font: 800 3.5rem/1.1 var(--display);
+    letter-spacing: -.02em; 
+    margin: 0 0 0; 
 }
 .grid{
-    margin: 8px;
+    max-width: 1500px;
+    margin: 60px auto;
+    padding: 0 2rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
     gap: 2em;
     justify-content: center;
     align-content: center;
@@ -55,7 +64,7 @@ header {
     aspect-ratio: 1/1;
     object-fit: cover;
     display: block;
-  border-bottom: 3px solid black;
+    border-bottom: 3px solid black;
 }
 .item a{
     text-decoration: none;
@@ -72,4 +81,44 @@ header {
     text-decoration-color:blue;
     text-decoration-thickness: 4px;
 
+}
+
+@media (max-width: 600px) {
+    .topbar {
+        padding: 0.75rem 1rem;
+    }
+
+    header {
+        padding: 2rem 1rem;
+    }
+
+    header h1 {
+        font-size: 2.2rem;
+    }
+
+    .grid {
+        margin: 2rem auto;
+        padding: 0 1rem;
+        gap: 1.25rem;
+    }
+}
+main{
+ 
+    min-height: 800px;
+    border:8px solid black;
+    gap:10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+.artist-image, .artist-details, .concerts,.back{
+    display: flex;
+    background-color: #ffd600   ;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    width: 200px;
 }

@@ -7,12 +7,16 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+      <nav class="topbar"><a href="/" class="brand">Groupie Tracker</a></nav>
    <main>
-    <nav class="topbar"><a href="/" class="brand">Groupie Tracker</a></nav>
+    <div>
     <a class ="back" href="/">Back to all artists</a>
-    <article>
-        <img src="{{.Image}}" alt ="{{.Name}}" width="360" height="360">
-        <div>
+    </div>
+    <article >
+        <div class ="artist-image">
+        <img src="{{.Image}}"  alt ="{{.Name}}" width="300" height="300">
+        </div>
+        <div class="artist-details">
             <h1>{{.Name}}</h1>
             <dl class ="details ">
                 <dt>Active since</dt><dd>{{.CreationDate}}</dd>
@@ -24,6 +28,7 @@
             </dl>
         </div>
     </article>
+    
     <section class="concerts">
     <h2>Concerts</h2>
     {{if not .Relations}}
