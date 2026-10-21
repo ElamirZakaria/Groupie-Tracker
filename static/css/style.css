@@ -1,19 +1,58 @@
+:root{
+    --ink: #181a24;
+    --yellow: #ffd600;
+      --display: "Rockwell Extra Bold", Rockwell, "Arial Black", "Helvetica Neue", sans-serif;
+}
+.topbar{
+    
+    background-color:  var(--ink);
+    padding: .75rem clamp(1rem, 4vw, 3rem);
+    
+    
+}
+.brand{
+    text-decoration: none;
+    color: var(--yellow);
+    font: 800 1.1rem var(--display);
+}
 .grid{
     display: grid;
-    grid-template-columns: 300px 300px 300px 300px;
-    
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 2em;
-    
-    
     justify-content: center;
     align-content: center;
 }
 .item {
-    
-    
     background-color: white;
     color : black;
-    border: 1.5 solid #111;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
+   border: 3px solid black;
+    text-align: center;
+    font-size: medium;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ;
+}
+.item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    display: block;
+  border-bottom: 3px solid black;
+}
+.item a{
+    text-decoration: none;
+    color:black;
+    font-family: cursive;
+    font-style: oblique;
+    font-weight: bolder;
+    font-size: x-large;
+
+}
+.item a:hover{
+    text-decoration: underline ;
+    text-decoration-style: solid;
+    text-decoration-color:blue;
+    text-decoration-thickness: 4px;
+
 }
