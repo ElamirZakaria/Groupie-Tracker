@@ -10,6 +10,8 @@ type Artist struct {
 	Locations    []string            `json:"-"`
 	ConcertDates []string            `json:"-"`
 	Relations    map[string][]string `json:"-"`
+	Tracks       []Track             `json:"-"`
+	ShowTracks   bool                `json:"-"`
 }
 type LocationTemplate struct {
 	ID        int      `json:"id"`
@@ -31,4 +33,12 @@ type RelationTemplate struct {
 }
 type Relation struct {
 	Index []RelationTemplate `json:"index"`
+}
+type Track struct {
+	TrackName  string `json:"trackName"`
+	PreviewURL string `json:"previewUrl"`
+	ArtworkURL string `json:"artworkUrl100"`
+}
+type TrackResponse struct {
+	Results []Track `json:"results"`
 }

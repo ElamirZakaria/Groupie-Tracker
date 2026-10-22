@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"groupie-tracker/models"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -106,4 +107,13 @@ func formatLocation(loc string) string {
 		parts[i] = strings.Join(words, " ")
 	}
 	return strings.Join(parts, ", ")
+}
+
+func FetchArtistTrack(artistName string) ([]models.Track, error) {
+	endpoint := fmt.Sprintf("https://itunes.apple.com/search?term=%s&entity=song&limit=5", url.QueryEscape(artistName))
+	res, err := FetchData[models.TrackResponse](endpoint)
+	if err != nil {
+		return nil, err
+	}
+	return res.Results, nil
 }

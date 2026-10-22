@@ -2,8 +2,10 @@ package handler
 
 import (
 	"bytes"
+	"groupie-tracker/api"
 	"groupie-tracker/models"
 	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -34,6 +36,7 @@ func render(w http.ResponseWriter, status int, templateName string, data any) {
 	var buff bytes.Buffer
 	err = tmpl.ExecuteTemplate(&buff, templateName, data)
 	if err != nil {
+		log.Println(err)
 		renderError(w, errorData{Msg: "500 Internal Server Error", Status: http.StatusInternalServerError})
 		return
 	}
@@ -107,4 +110,30 @@ func StaticHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fs := http.FileServer(http.Dir("static"))
 	http.StripPrefix("/static/", fs).ServeHTTP(w, r)
+}
+func (app *App) TrackHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		renderError(w, errorData{Msg: "405 Method Not Allowed", Status: http.StatusMethodNotAllowed})
+		return
+	}
+	idStr := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		renderError(w, errorData{Msg: "Error 400 Bad Request", Status: http.StatusBadRequest})
+	}
+	if id <= 0 || id > len(app.Artists) {
+		renderError(w, errorData{Msg: "Error 404 Artist Not Found", Status: http.StatusNotFound})
+		return
+	}
+	artist := app.Artists[id-1]
+	tracks, err := api.FetchArtistTrack(artist.Name)
+	if err != nil {
+
+		renderError(w, errorData{Msg: "500 Failed to fetch tracks from iTunes API", Status: http.StatusInternalServerError})
+		return
+	}
+	artist.Tracks = tracks
+	artist.ShowTracks = true
+	render(w, http.StatusOK, "artist.html", artist)
+
 }

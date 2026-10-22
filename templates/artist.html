@@ -26,9 +26,37 @@
                     <ul class="members">{{range .Members}}<li>{{.}}</li>{{end}}</ul>
                 </dd>
             </dl>
+            <div class = "event-action"> 
+                {{if not .ShowTracks}}
+                <a href="/track?id={{.ID}}#top-songs" class="btn-tracks">&#9835; Show Top Songs</a>
+                {{else}}
+                <a href="/artist?id={{.ID}}" class="btn-tracks btn-hide">Hide Top Songs</a>
+                {{end}}
+            </div>
         </div>
-    </article>
 
+        
+    </article>
+{{if .ShowTracks}}
+        <section id="top-songs" class="top-songs">
+            <h2>Top Songs</h2>
+            {{if not .Tracks}}
+                <p class="notice">No songs found for this artist on iTunes.</p>
+            {{else}}
+                <div class="tracks-grid">
+                    {{range .Tracks}}
+                    <div class="track-card">
+                        <img src="{{.ArtworkURL}}" alt="{{.TrackName}}" width="60" height="60">
+                        <div class="track-info">
+                            <strong>{{.TrackName}}</strong>
+                            <audio controls preload="none" src="{{.PreviewURL}}"></audio>
+                        </div>
+                    </div>
+                    {{end}}
+                </div>
+            {{end}}
+        </section>
+        {{end}}
     <section class="concerts">
     <h2>Concerts</h2>
     {{if not .Relations}}
