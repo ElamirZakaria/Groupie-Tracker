@@ -78,11 +78,7 @@ func (app *App) ArtistHandler(w http.ResponseWriter, r *http.Request) {
 		renderError(w, errorData{Msg: "405 Method Not Allowed", Status: http.StatusMethodNotAllowed})
 		return
 	}
-	idStr := strings.TrimPrefix(r.URL.Path, "/artist/")
-	if idStr == "" || strings.Contains(idStr, "/") {
-		renderError(w, errorData{Msg: "Error 404 Page Not Found", Status: http.StatusNotFound})
-		return
-	}
+	idStr := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		renderError(w, errorData{Msg: "Error 400 Bad Request", Status: http.StatusBadRequest})

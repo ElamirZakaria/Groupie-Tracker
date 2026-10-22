@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"groupie-tracker/models"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -64,7 +65,11 @@ func FetchAllData() ([]models.Artist, error) {
 	}
 	locationMap := make(map[int][]string)
 	for _, v := range locations.Index {
-		locationMap[v.ID] = v.Locations
+		formattedLocs := make([]string, len(v.Locations))
+		for i, loc := range v.Locations {
+			formattedLocs[i] = formatLocation(loc)
+		}
+		locationMap[v.ID] = formattedLocs
 	}
 	dateMap := make(map[int][]string)
 	for _, v := range dates.Index {
@@ -72,7 +77,11 @@ func FetchAllData() ([]models.Artist, error) {
 	}
 	relationsMap := make(map[int]map[string][]string)
 	for _, v := range relations.Index {
-		relationsMap[v.ID] = v.DatesLocations
+		formattedRel := make(map[string][]string, len(v.DatesLocations))
+		for loc, d := range v.DatesLocations {
+			formattedRel[formatLocation(loc)] = d
+		}
+		relationsMap[v.ID] = formattedRel
 	}
 	for i := range artists {
 		artists[i].Locations = locationMap[artists[i].ID]
@@ -81,4 +90,20 @@ func FetchAllData() ([]models.Artist, error) {
 
 	}
 	return artists, nil
+}
+func formatLocation(loc string) string {
+	parts := strings.Split(loc, "-") // to split country from city
+	for i, part := range parts {
+		words := strings.Split(part, "_") //to seperate multi-word name like new zealand
+		for j, word := range words {
+			lower := strings.ToLower(word)
+			if lower == "usa" || lower == "uk" || lower == "uae" {
+				words[j] = strings.ToUpper(lower)
+			} else if len(lower) > 0 {
+				words[j] = strings.ToUpper(lower[:1]) + lower[1:]
+			}
+		}
+		parts[i] = strings.Join(words, " ")
+	}
+	return strings.Join(parts, ", ")
 }
