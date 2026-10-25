@@ -19,15 +19,18 @@ var client = &http.Client{Timeout: 10 * time.Second}
 func FetchData[T any](url string) (T, error) {
 	var data T
 	resp, err := client.Get(url)
-	if err != nil {
+	if err != nil { // if invalid url - network unavailble  - DNS failure - Connection refused - conncetion timeout 
 		return data, err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
+	defer resp.Body.Close() // This means you have finished reading the data stream
+	//if you didn't close it this will increase memory and resource usage 
+	// if you close the body before checking the error if the resp is nil this line will cause panic
+	if resp.StatusCode != http.StatusOK { // this is the server response the server may respond with any status code 
 		return data, fmt.Errorf("unexpected HTTP status %d:",
 			resp.StatusCode)
 	}
-	err = json.NewDecoder(resp.Body).Decode(&data)
+	err = json.NewDecoder(resp.Body).Decode(&data) // The json is the response body resp.Body is a stream of data 
+	// After NewDecoder creates a JSON decoder that reads from the response body .Decode stores the decoded json into the data 
 	if err != nil {
 		return data, err
 	}
