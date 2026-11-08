@@ -5,7 +5,6 @@ import (
 	"groupie-tracker/api"
 	"groupie-tracker/models"
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -20,23 +19,17 @@ type errorData struct {
 	Status int
 }
 
-var tmpl *template.Template
+var tmpl = template.Must(template.ParseFiles(
+	"templates/artist.html",
+	"templates/index.html",
+	"templates/error.html",
+))
 
 func render(w http.ResponseWriter, status int, templateName string, data any) {
 
-	var err error
-	if tmpl == nil {
-		tmpl, err = template.ParseFiles("templates/artist.html", "templates/index.html", "templates/error.html")
-		if err != nil {
-			renderError(w, errorData{Msg: "500: Internal Server Error. Failed to load Templates", Status: http.StatusInternalServerError})
-			return
-
-		}
-	}
 	var buff bytes.Buffer
-	err = tmpl.ExecuteTemplate(&buff, templateName, data)
+	err := tmpl.ExecuteTemplate(&buff, templateName, data)
 	if err != nil {
-		log.Println(err)
 		renderError(w, errorData{Msg: "500 Internal Server Error", Status: http.StatusInternalServerError})
 		return
 	}
@@ -44,18 +37,8 @@ func render(w http.ResponseWriter, status int, templateName string, data any) {
 	buff.WriteTo(w)
 }
 func renderError(w http.ResponseWriter, data errorData) {
-
-	var err error
-	if tmpl == nil {
-		tmpl, err = template.ParseFiles("templates/artist.html", "templates/index.html", "templates/error.html")
-
-		if err != nil {
-			http.Error(w, data.Msg, data.Status)
-			return
-		}
-	}
 	var buff bytes.Buffer
-	err = tmpl.ExecuteTemplate(&buff, "error.html", data)
+	err := tmpl.ExecuteTemplate(&buff, "error.html", data)
 	if err != nil {
 		http.Error(w, data.Msg, data.Status)
 		return
@@ -67,6 +50,7 @@ func renderError(w http.ResponseWriter, data errorData) {
 func (app *App) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		renderError(w, errorData{Msg: "404 Page Not Found", Status: http.StatusNotFound})
+
 		return
 	}
 	if r.Method != http.MethodGet {
@@ -89,6 +73,7 @@ func (app *App) ArtistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if id <= 0 || id > len(app.Artists) {
 		renderError(w, errorData{Msg: "Error 404 Artist Not Found", Status: http.StatusNotFound})
+
 		return
 	}
 	render(w, http.StatusOK, "artist.html", app.Artists[id-1])
@@ -101,11 +86,13 @@ func StaticHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if strings.HasSuffix(r.URL.Path, "/") {
 		renderError(w, errorData{Msg: "404 page not found", Status: http.StatusNotFound})
+
 		return
 	}
 	filePath := strings.TrimPrefix(r.URL.Path, "/static/")
 	if info, err := os.Stat("static/" + filePath); err != nil || info.IsDir() {
 		renderError(w, errorData{Msg: "404 page not found", Status: http.StatusNotFound})
+
 		return
 	}
 	fs := http.FileServer(http.Dir("static"))
@@ -120,6 +107,7 @@ func (app *App) TrackHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		renderError(w, errorData{Msg: "Error 400 Bad Request", Status: http.StatusBadRequest})
+		return
 	}
 	if id <= 0 || id > len(app.Artists) {
 		renderError(w, errorData{Msg: "Error 404 Artist Not Found", Status: http.StatusNotFound})

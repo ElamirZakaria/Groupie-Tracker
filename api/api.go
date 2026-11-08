@@ -19,24 +19,23 @@ var client = &http.Client{Timeout: 10 * time.Second}
 func FetchData[T any](url string) (T, error) {
 	var data T
 	resp, err := client.Get(url)
-	if err != nil { // if invalid url - network unavailble  - DNS failure - Connection refused - conncetion timeout 
+	if err != nil { // if invalid url - network unavailble  - DNS failure - Connection refused - conncetion timeout
 		return data, err
 	}
 	defer resp.Body.Close() // This means you have finished reading the data stream
-	//if you didn't close it this will increase memory and resource usage 
+	//if you didn't close it this will increase memory and resource usage
 	// if you close the body before checking the error if the resp is nil this line will cause panic
-	if resp.StatusCode != http.StatusOK { // this is the server response the server may respond with any status code 
+	if resp.StatusCode != http.StatusOK { // this is the server response the server may respond with any status code
 		return data, fmt.Errorf("unexpected HTTP status %d:",
 			resp.StatusCode)
 	}
-	err = json.NewDecoder(resp.Body).Decode(&data) // The json is the response body resp.Body is a stream of data 
-	// After NewDecoder creates a JSON decoder that reads from the response body .Decode stores the decoded json into the data 
+	err = json.NewDecoder(resp.Body).Decode(&data) // The json is the response body resp.Body is a stream of data
+	// After NewDecoder creates a JSON decoder that reads from the response body .Decode stores the decoded json into the data
 	if err != nil {
 		return data, err
 	}
 	return data, err
 }
-
 func FetchAllData() ([]models.Artist, error) {
 	var (
 		artists                []models.Artist
@@ -46,6 +45,7 @@ func FetchAllData() ([]models.Artist, error) {
 		err1, err2, err3, err4 error
 		wg                     sync.WaitGroup
 	)
+
 	wg.Add(4)
 	go func() {
 		defer wg.Done()
@@ -64,36 +64,66 @@ func FetchAllData() ([]models.Artist, error) {
 		relations, err4 = FetchData[models.Relation](baseURL + "/relation")
 	}()
 	wg.Wait()
+
 	if err := errors.Join(err1, err2, err3, err4); err != nil {
 		return nil, err
 	}
-	locationMap := make(map[int][]string)
+
+	// Transform data via dedicated helpers
+	locMap := buildLocationMap(locations)
+	dateMap := buildDateMap(dates)
+	relMap := buildRelationsMap(relations)
+
+	// Combine into final artists slice
+	mergeArtistData(artists, locMap, dateMap, relMap)
+
+	return artists, nil
+}
+
+func buildLocationMap(locations models.Location) map[int][]string {
+	m := make(map[int][]string, len(locations.Index))
 	for _, v := range locations.Index {
-		formattedLocs := make([]string, len(v.Locations))
+		formatted := make([]string, len(v.Locations))
 		for i, loc := range v.Locations {
-			formattedLocs[i] = formatLocation(loc)
+			formatted[i] = formatLocation(loc)
 		}
-		locationMap[v.ID] = formattedLocs
+		m[v.ID] = formatted
 	}
-	dateMap := make(map[int][]string)
+	return m
+}
+
+func buildDateMap(dates models.Date) map[int][]string {
+	m := make(map[int][]string, len(dates.Index))
 	for _, v := range dates.Index {
-		dateMap[v.ID] = v.Dates
+		m[v.ID] = v.Dates
 	}
-	relationsMap := make(map[int]map[string][]string)
+	return m
+}
+
+func buildRelationsMap(relations models.Relation) map[int]map[string][]string {
+	m := make(map[int]map[string][]string, len(relations.Index))
 	for _, v := range relations.Index {
 		formattedRel := make(map[string][]string, len(v.DatesLocations))
 		for loc, d := range v.DatesLocations {
 			formattedRel[formatLocation(loc)] = d
 		}
-		relationsMap[v.ID] = formattedRel
+		m[v.ID] = formattedRel
 	}
-	for i := range artists {
-		artists[i].Locations = locationMap[artists[i].ID]
-		artists[i].ConcertDates = dateMap[artists[i].ID]
-		artists[i].Relations = relationsMap[artists[i].ID]
+	return m
+}
 
+func mergeArtistData(
+	artists []models.Artist,
+	locMap map[int][]string,
+	dateMap map[int][]string,
+	relMap map[int]map[string][]string,
+) {
+	for i := range artists {
+		id := artists[i].ID
+		artists[i].Locations = locMap[id]
+		artists[i].ConcertDates = dateMap[id]
+		artists[i].Relations = relMap[id]
 	}
-	return artists, nil
 }
 func formatLocation(loc string) string {
 	parts := strings.Split(loc, "-") // to split country from city
